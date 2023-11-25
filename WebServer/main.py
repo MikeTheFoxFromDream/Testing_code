@@ -1,8 +1,10 @@
+import time
 from http.server import HTTPServer, BaseHTTPRequestHandler
 
 
-class requestHandler(BaseHTTPRequestHandler):
+class RequestHandler(BaseHTTPRequestHandler):
 
+    # Prozatím jen pro testování funkčnosti avšak v budoucnu se bude možná zde aplikace rozvíjet
     def do_GET(self):
         self.send_response(200)
         self.send_header("content-type", "text/html")
@@ -15,13 +17,25 @@ class requestHandler(BaseHTTPRequestHandler):
         self.wfile.write(output.encode())
         return
 
+    # Zde čekáme na POST request s JSON souborem obsahujícím informace o
+    # herním módu (nadhozy, velikost stolu, opakování, etc)
     def do_POST(self):
         self.send_response(200)
-        print(self.rfile.read())
+        messageLength = self.headers.get("Content-length")
+        self.send_header("Content-type", "text/html")
+        self.end_headers()
+        self.wfile.write("\nData received \n\n".encode())
+        time.sleep(0.01)
+        startMode(self.rfile.read(int(messageLength)))
         return
 
 
-PORT = 9000
-server = HTTPServer(("", 9000), requestHandler)
+def startMode(data):
+    print(data)
+    return
+
+# Zde nastavujem PORT na kterém server poběží a zároveň jej zpustíme
+PORT = 8000
+server = HTTPServer(("", 8000), RequestHandler)
 server.serve_forever()
 server.server_close()
