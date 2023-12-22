@@ -1,4 +1,7 @@
+import pigpio
+import RPi.GPIO as GPIO
 import time
+import json
 from http.server import HTTPServer, BaseHTTPRequestHandler
 
 
@@ -9,7 +12,6 @@ class RequestHandler(BaseHTTPRequestHandler):
         self.send_response(200)
         self.send_header("content-type", "text/html")
         self.end_headers()
-
         output = ""
         output += "<html><body>"
         output += "<h1>Is JSON readable or breedable</h1>"
@@ -30,12 +32,20 @@ class RequestHandler(BaseHTTPRequestHandler):
         return
 
 
-def startMode(data):
-    print(data)
+def passNextBall(delay):
+
+    time.sleep(delay)
     return
 
-# Zde nastavujem PORT na kterém server poběží a zároveň jej zpustíme
-PORT = 8000
+def startMode(data):
+    jsonData = json.loads(data)
+    for ball in jsonData["micky"].items():
+        temp = str(ball[1]).replace("\'", "\"")
+        ballData = json.loads(temp)
+        passNextBall(int(ballData["delay"]))
+    return
+GPIO.setup(13, GPIO.OUT)
+
 server = HTTPServer(("", 8000), RequestHandler)
 server.serve_forever()
 server.server_close()
