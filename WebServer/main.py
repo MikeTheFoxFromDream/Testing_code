@@ -40,7 +40,9 @@ def passNextBall(delay):
         GPIO.output(PUL, GPIO.LOW)
     return
 
-def aimServo():
+def aimServo(pos):
+    servo.ChangeDutyCycle(pos / 18 + 2)
+    servo.ChangeDutyCycle(0)
     return
 
 def changeMotorSpeed():
@@ -52,6 +54,7 @@ def startMode(data):
     for ball in jsonData["micky"].items():
         temp = str(ball[1]).replace("\'", "\"")
         ballData = json.loads(temp)
+        aimServo(float(ballData["servoPos"]))
         passNextBall(nextDelay)
         nextDelay = int(ballData["delay"])
     return
@@ -72,6 +75,7 @@ GPIO.setup(EN, GPIO.OUT)
 GPIO.setup(SERVO, GPIO.OUT)
 
 servo = GPIO.PWM(SERVO, 50)
+servo.start(0)
 
 server = HTTPServer(("", 8000), RequestHandler)
 server.serve_forever()
