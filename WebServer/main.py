@@ -35,13 +35,15 @@ def passNextBall(delay):
     time.sleep(delay)
     #set DIP pins on S1=ON, S2=OFF, S3=ON
     for x in range(1, 201):
-        GPIO.output(EN, GPIO.HIGH)
         GPIO.output(PUL, GPIO.HIGH)
+        time.sleep(0.00005)
         GPIO.output(PUL, GPIO.LOW)
+        time.sleep(0.00005)
     return
 
 def aimServo(pos):
     servo.ChangeDutyCycle(pos / 18 + 2)
+    time.sleep(0.3)
     servo.ChangeDutyCycle(0)
     return
 
@@ -64,19 +66,23 @@ GPIO.cleanup()
 GPIO.setmode(GPIO.BOARD)
 
 nextDelay = 0
-PUL = 6
-DIR = 13
-EN = 12
-SERVO = 14
+PUL = 31
+DIR = 33
+EN = 32
+SERVO = 11
 
 GPIO.setup(DIR, GPIO.OUT)
 GPIO.setup(PUL, GPIO.OUT)
 GPIO.setup(EN, GPIO.OUT)
 GPIO.setup(SERVO, GPIO.OUT)
+GPIO.output(EN, GPIO.LOW)
+GPIO.output(DIR, GPIO.LOW)
 
 servo = GPIO.PWM(SERVO, 50)
 servo.start(0)
 
+servo.ChangeDutyCycle(2)
+servo.ChangeDutyCycle(0)
 server = HTTPServer(("", 8000), RequestHandler)
 server.serve_forever()
 server.server_close()
